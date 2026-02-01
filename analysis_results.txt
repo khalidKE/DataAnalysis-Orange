@@ -1,0 +1,26 @@
+--- Model Results ---
+
+Logistic Regression:
+Accuracy: 0.6540, F1: 0.6611
+
+Random Forest:
+Accuracy: 0.6825, F1: 0.7087
+Top Features: {'TenureDays': 0.226418801878466, 'LocationCode': 0.08334782213559484, 'Training Cost': 0.08193486850525063, 'JobFunctionDescription': 0.05967285347873739, 'Division': 0.05175457496305779}
+
+Gradient Boosting:
+Accuracy: 0.6582, F1: 0.6861
+
+--- Analytics ---
+Avg Perf by Training Outcome:
+Training Outcome
+Incomplete    3.013547
+Completed     3.003745
+Failed        2.997337
+Passed        2.991094
+Name: PerformanceNum, dtype: float64
+Top Dept Satisfaction:
+DepartmentType
+Sales                   3.147826
+Software Engineering    3.132231
+Executive Office        3.080000
+Name: Satisfaction Score, dtype: float64

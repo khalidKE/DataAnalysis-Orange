@@ -1,0 +1,114 @@
+What factors predict employee turnover?
+Use: ExitDate + TerminationType + scores
+Does training improve performance ratings?
+Training Duration,Performance Score
+
+Which departments have the highest satisfaction and engagement?(Power Bi)
+Compare Engagement Score and Satisfaction Score by Department/Division.
+
+Are certain job roles more likely to leave?
+
+Question:
+Turnover rate by Title or JobFunctionDescription.
+
+Bonus advanced ideas (if doing ML or projects)
+
+If you’re building a Power BI or AI analytics project, you could:
+
+Predict turnover (classification model)
+
+Predict performance score (regression)
+
+Recommend training programs
+---------------------------------------------------------------------------------------
+
+Build KPIs dashboard plan:
+
+Total Employees
+
+Active Employees
+
+Turnover Rate %
+
+Avg Performance Score
+Visuals:
+
+Employees by Department → Bar chart
+Employee Status (Active/Terminated) → Donut chart
+Headcount over time (StartDate) → Line chart
+Performance by Department → Bar chart
+Performance by Job Title → Bar
+
+page 2
+
+Training Effectiveness
+
+👉 Measure ROI of training
+
+KPIs
+
+Total Training Cost
+
+Avg Training Duration
+
+Completion Rate %
+
+Success Rate %
+
+Visuals
+
+Training Outcome (Completed/Failed) → Donut
+
+Cost vs Outcome → Bar
+
+Training Type vs Performance → Column
+
+Training Program comparison → Bar
+
+Cost vs Performance → Scatter
+
+Insights answered:
+
+Are we wasting money?
+
+Which programs work best?
+
+Visuals
+
+Turnover by Department → Bar
+
+Turnover by Job Title → Bar
+
+Exit reasons → Pie
+
+Insights answered:
+
+Why employees leave?
+
+Where should HR intervene?
+
+
+
+🧮 Important Measures (Power BI DAX)
+Headcount
+Total Employees = COUNT('HR'[Employee ID])
+
+Active Employees
+Active = CALCULATE(COUNT('HR'[Employee ID]), 'HR'[EmployeeStatus] = "Active")
+
+Turnover Rate
+Turnover % = 
+DIVIDE(
+    COUNTROWS(FILTER('HR', NOT(ISBLANK('HR'[ExitDate])))),
+    [Total Employees]
+)
+
+Avg Satisfaction
+Avg Satisfaction = AVERAGE('HR'[Satisfaction Score])
+
+Avg Performance
+Avg Performance = AVERAGE('HR'[Current Employee Rating])
+
+Training Cost
+Total Training Cost = SUM('HR'[Training Cost])
+
