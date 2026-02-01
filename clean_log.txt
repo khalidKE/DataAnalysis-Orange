@@ -1,0 +1,17 @@
+--- File: FactSale.csv ---
+First line: "Sale Key","City Key","Customer Key","Bill To Customer Key","Stock Item Key","Invoice Date Key","Delivery Date Key","Salesperson Key","WWI Invoice ID","Description","Package","Quantity","Unit Price","Tax Rate","Total Excluding Tax","Tax Amount","Profit","Total Including Tax","Total Dry Items","Total Chiller Items","Lineage Key"
+Columns: ['Sale Key', 'City Key', 'Customer Key', 'Bill To Customer Key', 'Stock Item Key', 'Invoice Date Key', 'Delivery Date Key', 'Salesperson Key', 'WWI Invoice ID', 'Description', 'Package', 'Quantity', 'Unit Price', 'Tax Rate', 'Total Excluding Tax', 'Tax Amount', 'Profit', 'Total Including Tax', 'Total Dry Items', 'Total Chiller Items', 'Lineage Key']
+--- File: DimCustomer.csv ---
+First line: Customer Data,,,,,,,,,,,
+Columns: ['Customer Data', 'Unnamed: 1', 'Unnamed: 2', 'Unnamed: 3', 'Unnamed: 4', 'Unnamed: 5', 'Unnamed: 6', 'Unnamed: 7', 'Unnamed: 8', 'Unnamed: 9', 'Unnamed: 10', 'Unnamed: 11']
+--- File: DimStockItem.csv ---
+First line: ",,",,,,,,,,,,,,,,,,,,,,
+Columns: [',,', 'Unnamed: 1', 'Unnamed: 2', 'Unnamed: 3', 'Unnamed: 4', 'Unnamed: 5', 'Unnamed: 6', 'Unnamed: 7', 'Unnamed: 8', 'Unnamed: 9', 'Unnamed: 10', 'Unnamed: 11', 'Unnamed: 12', 'Unnamed: 13', 'Unnamed: 14', 'Unnamed: 15', 'Unnamed: 16', 'Unnamed: 17', 'Unnamed: 18', 'Unnamed: 19', 'Unnamed: 20']
+--- File: DimCity.csv ---
+First line: "City Key","City","State Province","Country","Sales Territory","Location","Latest Recorded Population"
+Columns: ['City Key', 'City', 'State Province', 'Country', 'Sales Territory', 'Location', 'Latest Recorded Population']
+--- File: DimDate.csv ---
+First line: Date,Day Number,Day,Month,Short Month,Calendar Month Number,Calendar Month Label,Calendar Year,Calendar Year Label,Fiscal Month Number,Fiscal Month Label,Fiscal Year,Fiscal Year Label,ISO Week Number
+Columns: ['Date', 'Day Number', 'Day', 'Month', 'Short Month', 'Calendar Month Number', 'Calendar Month Label', 'Calendar Year', 'Calendar Year Label', 'Fiscal Month Number', 'Fiscal Month Label', 'Fiscal Year', 'Fiscal Year Label', 'ISO Week Number']
+--- File: DimEmployee.xlsx ---
+Columns: ['Employee Key', 'WWI Employee ID', 'Employee', 'Preferred Name', 'Is Salesperson', 'Photo', 'Valid From', 'Valid To', 'Lineage Key']
