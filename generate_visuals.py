@@ -9,17 +9,18 @@ plt.style.use('seaborn-v0_8')
 plt.rcParams['figure.figsize'] = (10, 6)
 
 # Load cleaned data
-df = pd.read_csv('Cleaned_Global_Sales_Analysis.csv')
+df = pd.read_csv('Master_Cleaned_Sales_Data.csv')
 
 # Create a folder for images
 if not os.path.exists('VISUALS'):
     os.makedirs('VISUALS')
 
 # 1. Sales by Product Category (Top 10)
+# Use 'Stock Item' which is now in Title Case
 top_products = df.groupby('Stock Item')['Total Including Tax'].sum().sort_values(ascending=False).head(10)
 plt.figure()
 top_products.plot(kind='barh', color='skyblue')
-plt.title('Top 10 Products by Total Sales')
+plt.title('Top 10 Products by Total Sales (Master Data)')
 plt.xlabel('Sales Amount')
 plt.ylabel('Product')
 plt.tight_layout()
@@ -33,13 +34,14 @@ plt.title('Sales Distribution by State')
 plt.ylabel('')
 plt.savefig('VISUALS/sales_by_state.png')
 
-# 3. Monthly Sales Trend
-# Need to ensure Invoice Date Key is datetime
+# 3. Monthly Sales Trend (Using Bonus Columns)
+# Since we already have 'Year' and 'Month' from the cleaning script
+# We can sort by date to ensure the trend is correct
 df['Invoice Date Key'] = pd.to_datetime(df['Invoice Date Key'])
-monthly_sales = df.set_index('Invoice Date Key')['Total Including Tax'].resample('M').sum()
+monthly_sales = df.groupby(df['Invoice Date Key'].dt.to_period('M'))['Total Including Tax'].sum()
 plt.figure()
 monthly_sales.plot(kind='line', marker='o', color='green')
-plt.title('Monthly Sales Trend')
+plt.title('Monthly Sales Trend (Analysis-Ready)')
 plt.xlabel('Month')
 plt.ylabel('Sales Amount')
 plt.grid(True)

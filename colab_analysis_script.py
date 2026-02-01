@@ -1,8 +1,3 @@
-# Midterm Project: Global Sales Analysis
-# This script is optimized for Google Colab/Local Python environment
-
-import pandas as pd
-import numpy as np
 import pandas as pd
 import numpy as np
 import os
@@ -24,18 +19,16 @@ def load_data():
     dim_customer = pd.read_csv('DimCustomer.csv', skiprows=1)
     dim_product = pd.read_csv('DimStockItem.csv', skiprows=1)
     dim_city = pd.read_csv('DimCity.csv')
-    dim_date = pd.read_csv('DimDate.csv')
     
-    # Optional Employee data handling
     if os.path.exists('DimEmployee.xlsx'):
         dim_employee = pd.read_excel('DimEmployee.xlsx')
     else:
         dim_employee = pd.DataFrame()
         
-    return fact_sales, dim_customer, dim_product, dim_city, dim_date, dim_employee
+    return fact_sales, dim_customer, dim_product, dim_city, dim_employee
 
-# 2. Cleaning & Engineering
-def process_data(fact, customer, product, city, date, employee):
+# 2. Cleaning & Engineering (Professional Version)
+def process_data(fact, customer, product, city, employee):
     # Duplicates
     fact = fact.drop_duplicates()
     
@@ -44,12 +37,24 @@ def process_data(fact, customer, product, city, date, employee):
     fact['Total Including Tax'] = fact['Total Including Tax'].fillna(fact['Total Including Tax'].median())
     fact['Profit'] = fact['Profit'].fillna(0)
     
-    # Date conversion
+    # Title Case for better visuals
+    for df in [customer, product, city]:
+        text_cols = df.select_dtypes(include='object').columns
+        for col in text_cols:
+            df[col] = df[col].astype(str).str.strip().str.title()
+    
+    # Date conversion & Bonus Columns
     fact['Invoice Date Key'] = pd.to_datetime(fact['Invoice Date Key'], errors='coerce')
+    fact['Year'] = fact['Invoice Date Key'].dt.year
+    fact['Month'] = fact['Invoice Date Key'].dt.month_name()
     
     # Feature Engineering
     fact['Profit Margin'] = np.where(fact['Total Including Tax'] != 0, fact['Profit'] / fact['Total Including Tax'], 0)
-    fact['Customer Segment'] = fact['Total Including Tax'].apply(lambda x: 'High' if x > 5000 else ('Medium' if x > 1000 else 'Standard'))
+    fact['Customer Segment'] = fact['Total Including Tax'].apply(lambda x: 'High Value' if x > 5000 else ('Medium Value' if x > 1000 else 'Standard'))
+    
+    # Type Conversion for Merging
+    fact['Stock Item Key'] = fact['Stock Item Key'].astype(int)
+    product['Stock Item Key'] = product['Stock Item Key'].astype(int)
     
     # Merging
     merged = fact.merge(product[['Stock Item Key', 'Stock Item', 'Color']], on='Stock Item Key', how='left')
@@ -60,12 +65,12 @@ def process_data(fact, customer, product, city, date, employee):
 
 # 3. Main execution
 print("Starting analysis...")
-fact, customer, product, city, date, employee = load_data()
-df = process_data(fact, customer, product, city, date, employee)
+fact, customer, product, city, employee = load_data()
+df = process_data(fact, customer, product, city, employee)
 
 # Save cleaned data
-df.to_csv('Cleaned_Global_Sales.csv', index=False)
-print("Saved cleaned data to Cleaned_Global_Sales.csv")
+df.to_csv('Master_Cleaned_Sales_Data.csv', index=False)
+print("Saved cleaned data to Master_Cleaned_Sales_Data.csv")
 
 # 4. Visualizations
 if HAS_VISUALS:
@@ -79,21 +84,20 @@ if HAS_VISUALS:
         plt.ylabel('Total Sales')
         plt.xticks(rotation=45, ha='right')
         plt.tight_layout()
-        plt.savefig('top_10_products.png')
         plt.show()
 
-        # Plot 2: Sales by Customer Segment
-        plt.figure(figsize=(8, 8))
-        df.groupby('Customer Segment')['Total Including Tax'].sum().plot(kind='pie', autopct='%1.1f%%')
-        plt.title('Sales Distribution by Customer Segment')
-        plt.savefig('sales_by_segment.png')
+        # Plot 2: Sales Trend (Bonus)
+        plt.figure(figsize=(10, 6))
+        df.groupby(df['Invoice Date Key'].dt.to_period('M'))['Total Including Tax'].sum().plot(kind='line', marker='o')
+        plt.title('Monthly Sales Trend')
+        plt.grid(True)
         plt.show()
-        print("✅ تم توليد الصور البيانية (top_10_products.png, sales_by_segment.png)")
+        
+        print("✅ تم توليد الصور البيانية بنجاح.")
     except Exception as e:
         print(f"⚠️ فشل توليد الرسوم البيانية: {e}")
 else:
-    print("\n💡 نصيحة: للحصول على الرسوم البيانية داخل Python، يمكنك تشغيل هذا الكود في Google Colab.")
-    print("أو يمكنك استخدام ملف 'Cleaned_Global_Sales.csv' مباشرة في Power BI لإنشاء لوحات التحكم.")
+    print("\n💡 Tip: Run this code in Google Colab to see interactive charts!")
 
 print("\n--- Summary Statistics ---")
 print(f"Total Sales: {df['Total Including Tax'].sum():,.2f}")
