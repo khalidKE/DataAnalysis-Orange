@@ -30,7 +30,8 @@ try:
             dim_employee = pd.DataFrame()
          
     if not dim_employee.empty:
-      
+        pass
+            
 except Exception as e:
     dim_employee = pd.DataFrame()
 
