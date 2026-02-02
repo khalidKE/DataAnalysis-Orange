@@ -3,17 +3,13 @@ import numpy as np
 import os
 import sys
 
-# Try importing visualization libraries
 try:
     import matplotlib.pyplot as plt
     import seaborn as sns
     HAS_VISUALS = True
 except ImportError:
     HAS_VISUALS = False
-    print("⚠️ تحذير: مكتبات الرسم البياني (matplotlib/seaborn) غير متوفرة حالياً.")
-    print("سيتم تنفيذ عملية تنظيف البيانات وحساب الإحصائيات فقط.")
 
-# 1. Load Data
 def load_data():
     fact_sales = pd.read_csv('FactSale.csv')
     dim_customer = pd.read_csv('DimCustomer.csv', skiprows=1)
@@ -27,57 +23,46 @@ def load_data():
         
     return fact_sales, dim_customer, dim_product, dim_city, dim_employee
 
-# 2. Cleaning & Engineering (Professional Version)
 def process_data(fact, customer, product, city, employee):
-    # Duplicates
+                
     fact = fact.drop_duplicates()
-    
-    # Missing values
+
     fact['Quantity'] = fact['Quantity'].fillna(0)
     fact['Total Including Tax'] = fact['Total Including Tax'].fillna(fact['Total Including Tax'].median())
     fact['Profit'] = fact['Profit'].fillna(0)
-    
-    # Title Case for better visuals
+
     for df in [customer, product, city]:
         text_cols = df.select_dtypes(include='object').columns
         for col in text_cols:
             df[col] = df[col].astype(str).str.strip().str.title()
-    
-    # Date conversion & Bonus Columns
+
     fact['Invoice Date Key'] = pd.to_datetime(fact['Invoice Date Key'], errors='coerce')
     fact['Year'] = fact['Invoice Date Key'].dt.year
     fact['Month'] = fact['Invoice Date Key'].dt.month_name()
-    
-    # Feature Engineering
+
     fact['Profit Margin'] = np.where(fact['Total Including Tax'] != 0, fact['Profit'] / fact['Total Including Tax'], 0)
     fact['Customer Segment'] = fact['Total Including Tax'].apply(lambda x: 'High Value' if x > 5000 else ('Medium Value' if x > 1000 else 'Standard'))
-    
-    # Type Conversion for Merging
+
     fact['Stock Item Key'] = fact['Stock Item Key'].astype(int)
     product['Stock Item Key'] = product['Stock Item Key'].astype(int)
-    
-    # Merging
+
     merged = fact.merge(product[['Stock Item Key', 'Stock Item', 'Color']], on='Stock Item Key', how='left')
     merged = merged.merge(city[['City Key', 'City', 'State Province']], on='City Key', how='left')
     merged = merged.merge(customer[['Customer Key', 'Customer']], on='Customer Key', how='left')
     
     return merged
 
-# 3. Main execution
 print("Starting analysis...")
 fact, customer, product, city, employee = load_data()
 df = process_data(fact, customer, product, city, employee)
 
-# Save cleaned data
 df.to_csv('Master_Cleaned_Sales_Data.csv', index=False)
 print("Saved cleaned data to Master_Cleaned_Sales_Data.csv")
 
-# 4. Visualizations
 if HAS_VISUALS:
     try:
         plt.style.use('ggplot')
 
-        # Plot 1: Top 10 Products
         plt.figure(figsize=(12, 6))
         df.groupby('Stock Item')['Total Including Tax'].sum().sort_values(ascending=False).head(10).plot(kind='bar', color='teal')
         plt.title('Top 10 Products by Sales')
@@ -86,16 +71,13 @@ if HAS_VISUALS:
         plt.tight_layout()
         plt.show()
 
-        # Plot 2: Sales Trend (Bonus)
         plt.figure(figsize=(10, 6))
         df.groupby(df['Invoice Date Key'].dt.to_period('M'))['Total Including Tax'].sum().plot(kind='line', marker='o')
         plt.title('Monthly Sales Trend')
         plt.grid(True)
         plt.show()
         
-        print("✅ تم توليد الصور البيانية بنجاح.")
     except Exception as e:
-        print(f"⚠️ فشل توليد الرسوم البيانية: {e}")
 else:
     print("\n💡 Tip: Run this code in Google Colab to see interactive charts!")
 

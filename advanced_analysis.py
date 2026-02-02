@@ -4,25 +4,21 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import os
 
-# Set Plotting Style
 plt.style.use('ggplot')
 sns.set_palette("viridis")
 
-# Load the Master Data
 print("⏳ Loading Master Cleaned Data...")
 df = pd.read_csv('Master_Cleaned_Sales_Data.csv')
 df['Invoice Date Key'] = pd.to_datetime(df['Invoice Date Key'])
 
-# Create folder for Advanced Visuals
 if not os.path.exists('ADVANCED_ANALYSIS'):
     os.makedirs('ADVANCED_ANALYSIS')
 
 print("📊 Performing Advanced Data Analysis...")
 
-# 1. Correlation Matrix of Numerical Features
 plt.figure(figsize=(12, 10))
 numerical_cols = df.select_dtypes(include=[np.number]).columns
-# Remove keys and IDs from correlation
+                                      
 cols_to_corr = [c for c in numerical_cols if 'Key' not in c and 'ID' not in c]
 corr = df[cols_to_corr].corr()
 sns.heatmap(corr, annot=True, cmap='coolwarm', fmt=".2f")
@@ -30,7 +26,6 @@ plt.title('Feature Correlation Heatmap')
 plt.tight_layout()
 plt.savefig('ADVANCED_ANALYSIS/correlation_heatmap.png')
 
-# 2. Sales Distribution by Sales Territory
 plt.figure(figsize=(12, 6))
 sns.barplot(x='Sales Territory', y='Total Including Tax', data=df, estimator=sum, ci=None)
 plt.title('Total Sales by Territory')
@@ -38,7 +33,6 @@ plt.xticks(rotation=45)
 plt.tight_layout()
 plt.savefig('ADVANCED_ANALYSIS/sales_by_territory.png')
 
-# 3. Monthly Sales Growth Rate
 monthly_sales = df.groupby(df['Invoice Date Key'].dt.to_period('M'))['Total Including Tax'].sum()
 growth_rate = monthly_sales.pct_change() * 100
 plt.figure(figsize=(12, 6))
@@ -49,7 +43,6 @@ plt.ylabel('Growth Percentage')
 plt.tight_layout()
 plt.savefig('ADVANCED_ANALYSIS/monthly_growth_rate.png')
 
-# 4. Product Color Profitability Analysis
 color_profit = df.groupby('Color')['Profit'].mean().sort_values(ascending=False)
 plt.figure(figsize=(10, 6))
 color_profit.plot(kind='bar', color='purple')
@@ -58,7 +51,6 @@ plt.ylabel('Avg Profit')
 plt.tight_layout()
 plt.savefig('ADVANCED_ANALYSIS/color_profitability.png')
 
-# 5. Top 10 Customers by Total Spend
 top_customers = df.groupby('Customer')['Total Including Tax'].sum().sort_values(ascending=False).head(10)
 plt.figure(figsize=(12, 6))
 top_customers.plot(kind='barh', color='teal')

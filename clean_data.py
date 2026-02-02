@@ -2,26 +2,21 @@ import pandas as pd
 import numpy as np
 import os
 
-# =========================================
-# 1. تحميل البيانات مع مراعاة ملاحظات الجودة
-# =========================================
-print("⏳ جاري تحميل البيانات...")
 
-# تحميل الجداول الأساسية
+
 fact_sales = pd.read_csv('FactSale.csv')
 dim_customer = pd.read_csv('DimCustomer.csv', skiprows=1)
 dim_product = pd.read_csv('DimStockItem.csv', skiprows=1)
 dim_city = pd.read_csv('DimCity.csv')
 dim_date = pd.read_csv('DimDate.csv')
 
-# محاولة تحميل ملف الموظفين بمرونة (يدعم الصيغتين المتوقعتين)
 try:
     if os.path.exists('DimEmployee.xlsx'):
         dim_employee = pd.read_excel('DimEmployee.xlsx')
     elif os.path.exists('DimEmployee.csv'):
         dim_employee = pd.read_csv('DimEmployee.csv')
     else:
-        # الحالات التي قد يظهر فيها الاسم بشكل مدمج كما ذكرت في الملاحظات
+                                                                         
         found = False
         for f in os.listdir('.'):
             if 'DimEmployee' in f:
@@ -33,53 +28,41 @@ try:
                 break
         if not found:
             dim_employee = pd.DataFrame()
-            print("⚠️ لم يتم العثور على ملف الموظفين")
+         
     if not dim_employee.empty:
-        print("✅ تم تحميل بيانات الموظفين بنجاح")
+      
 except Exception as e:
     dim_employee = pd.DataFrame()
-    print(f"⚠️ خطأ أثناء تحميل ملف الموظفين: {e}")
 
-# =========================================
-# 2. تنظيف متقدم (Advanced Cleaning)
-# =========================================
+
 def clean_df(df, name):
     if df.empty: return df
-    
-    # 2.1 إزالة التكرارات
+
     df = df.drop_duplicates()
-    
-    # 2.2 تنظيف النصوص وتوحديد المظهر (Title Case)
+
     text_cols = df.select_dtypes(include='object').columns
     for col in text_cols:
-        # تحويل لـ Title Case يحسن المظهر في Power BI (مثلاً: NEW YORK -> New York)
+                                                                                   
         df[col] = df[col].astype(str).str.strip().str.title()
     
     return df
 
-print("✨ جاري تطبيق التنظيف المتقدم وتوحيد تنسيق النصوص...")
 fact_sales = clean_df(fact_sales, "FactSale")
 dim_customer = clean_df(dim_customer, "DimCustomer")
 dim_product = clean_df(dim_product, "DimProduct")
 dim_city = clean_df(dim_city, "DimCity")
 
-# =========================================
-# 3. هندسة البيانات للتحليل الزمني (Bonus Insight)
-# =========================================
-print("📅 جاري استخراج الخصائص الزمنية (بونص التحليل)...")
 fact_sales['Invoice Date Key'] = pd.to_datetime(fact_sales['Invoice Date Key'], errors='coerce')
 fact_sales['Year'] = fact_sales['Invoice Date Key'].dt.year
 fact_sales['Month'] = fact_sales['Invoice Date Key'].dt.month_name()
 fact_sales['Day_of_Week'] = fact_sales['Invoice Date Key'].dt.day_name()
 
-# حساب هامش الربح مع تجنب القسمة على صفر (حركة ذكية)
 fact_sales['Profit Margin'] = np.where(
     fact_sales['Total Including Tax'] != 0,
     fact_sales['Profit'] / fact_sales['Total Including Tax'],
     0
 )
 
-# تصنيف العملاء حسب قيمة المشتريات (High, Medium, Standard)
 def get_segment(total):
     if total > 5000: return 'High Value'
     elif total > 1000: return 'Medium Value'
@@ -87,12 +70,7 @@ def get_segment(total):
 
 fact_sales['Customer Segment'] = fact_sales['Total Including Tax'].apply(get_segment)
 
-# =========================================
-# 4. الربط الذكي وتوحيد الأنواع (Data Merging)
-# =========================================
-print("🔗 جاري دمج الجداول مع توحيد أنواع المفاتيح...")
 
-# التأكد من توافق الأنواع قبل الدمج لمنع الأخطاء الشائعة
 keys_to_int = ['Stock Item Key', 'City Key', 'Customer Key']
 for key in keys_to_int:
     if key in fact_sales.columns:
@@ -104,7 +82,6 @@ for key in keys_to_int:
     if key in dim_customer.columns and key == 'Customer Key':
         dim_customer[key] = pd.to_numeric(dim_customer[key], errors='coerce').fillna(0).astype(int)
 
-# تنفيذ عملية الدمج (Merging)
 final_report = fact_sales.merge(
     dim_product[['Stock Item Key', 'Stock Item', 'Color']], 
     on='Stock Item Key', how='left'
@@ -116,7 +93,6 @@ final_report = fact_sales.merge(
     on='Customer Key', how='left'
 )
 
-# دمج بيانات الموظفين إذا وجدت
 if not dim_employee.empty and 'Salesperson Key' in fact_sales.columns:
     dim_employee['Employee Key'] = pd.to_numeric(dim_employee['Employee Key'], errors='coerce').fillna(0).astype(int)
     final_report = final_report.merge(
@@ -124,12 +100,6 @@ if not dim_employee.empty and 'Salesperson Key' in fact_sales.columns:
         left_on='Salesperson Key', right_on='Employee Key', how='left'
     )
 
-# =========================================
-# 5. حفظ الملف النهائي للـ Power BI
-# =========================================
 output_file = 'Master_Cleaned_Sales_Data.csv'
 final_report.to_csv(output_file, index=False)
 
-print(f"\n🚀 تم تجهيز ملف {output_file} بنجاح!")
-print(f"📊 إجمالي السجلات: {len(final_report)}")
-print(f"� نصيحة: استخدم أعمدة 'Year' و 'Month' في Power BI لعمل تحليل سلاسل زمنية رائع.")
