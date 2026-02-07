@@ -1,4 +1,4 @@
-# 🚀 Customer Satisfaction (CX) AI Prediction Engine
+#  Customer Satisfaction AI Prediction Engine
 
 An elite, high-precision machine learning system designed to predict customer satisfaction and identify churn risks with surgical precision. This project leverages advanced feature engineering and a heavy-duty stacking ensemble to break through traditional accuracy barriers in CX analytics.
 
@@ -80,5 +80,5 @@ python main_project.py
 - **Advanced Ensemble:** Implementation of a multi-stage stacking architecture for maximum robustness.
 - **Explainable AI:** Integrated SHAP values to transform "black box" predictions into clear business roadmap items.
 
----
-*Created with ❤️ by the CX AI Team*
+
+
