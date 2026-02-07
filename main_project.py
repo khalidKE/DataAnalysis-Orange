@@ -11,6 +11,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from imblearn.over_sampling import SMOTE
 import xgboost as xgb
 import shap
+from ydata_profiling import ProfileReport
 import warnings
 import sys
 
@@ -149,3 +150,9 @@ with open('ai_insights_summary.md', 'w', encoding='utf-8') as f:
     f.write(report)
 
 print(f"\nSUCCESS! AI system deployed at {best_acc:.2%} precision.")
+
+# Generate Comprehensive HTML Report
+print("Generating comprehensive HTML profile report...")
+profile = ProfileReport(df, title="Customer Satisfaction Comprehensive Report", explorative=True)
+profile.to_file("comprehensive_report.html")
+print("Report saved as comprehensive_report.html")
